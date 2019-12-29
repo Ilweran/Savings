@@ -17,110 +17,85 @@ private:
   double money;
   double rate;
   int time;
-  double findValue(double m, double r, double t)
+  double findValue(double m, double r, int t)
   {
-    double res=m;
-    for(int i=1; i<=t; i++)
-      res=res*(1+r/100);
-    return res;
-  }
-  void showTable(bool style=false)
-  {
-    cout<<"| Вкладчик\t"<<"| Сумма\t"<<"| Время\t";
-    if(style)
+    if(t==0)
     {
-      cout<<"| Сумма\t"<<"| Время\t";
+      return m;
+    } 
+    else
+    {
+      return findValue(m, r, t-1)* (1 + r/100);
     }
-    cout<<"| % \t"<<"| Всего |\n";
   }
-  void showData(double m, int t)
-  {
-    cout<<"| "<<name<<"\t";
-    cout<<"| "<<money<<"\t";
-    cout<<"| "<<time<<"\t";
-    cout<<"| "<<m<<"\t";
-    cout<<"| "<<time-t<<"\t";
-    cout<<"| "<<rate<<"\t";
-    cout<<"| "<<result(m,t)<<" |\n";
-    cout<<endl;
-  }
-  void showData()
-  {
-    cout << "| " << name << "\t";
-    cout << "| " << money << "\t";
-    cout << "| " << time << "\t";
-    cout << "| " << rate << "\t";
-    cout << "| " << result() << "\t";
-    cout << endl;
-  }
-  double result()
+  double total()
   {
     return findValue(money, rate, time);
   }
-  double result(double m, int t)
-  {
-    double m1, m2;
-    m1=findValue(money,rate,time);
-    if(t>time)
-      {
-	return m1;
-      }
-    else
-      {
-	m2=findValue(m,rate,time-t);
-	return m1+m2;
-      }
-  }
+
 public:
-  void setAll(string n, double m, double r, int t)
+  void set(string n,double m,double r,int t)
   {
     name=n; money=m; rate=r; time=t;
   }
-  void setAll(string n)
+
+  BankAccount(string n,double m,double r,int t)
   {
-    setAll(n, 100, 13, 3);
-  }
-  void setName(string n)
-  {
-    name=n;
+    set(n, m, r, t);
   }
 
-  void show(double m, int t)
+  BankAccount()
   {
-    showTable(true);
-    showData(m, t);
-  }
-  void show(double m)
-  {
-    show(m, 1);
+    set("Anonimus",0,0,0);
   }
   void show()
   {
-    showTable();
-    showData();
+    cout<<"Данные по банковскому счету.\n";
+    cout<<"Вкладчик:\t"<<name<<endl;
+    cout<<"Сумма:\t"<<money<<endl;
+    cout<<"Ставка %:\t"<<rate<<endl;
+    cout<<"Время:\t"<<time<<endl;
+    cout<<"Всего:\t"<<total()<<endl;
+    cout<<endl;
   }
-  BankAccount(string name)
+  BankAccount operator+(int t)
   {
-    setAll(name);
-    show();
-  }
-  // Конструктор класса (с 4 аргументами):
-  BankAccount(string name, double m,double r,int t)
-  {
-    setAll(name, m, r, t);
-    show();
-  }
 
+    BankAccount tmp;
+    tmp.set(name,money,rate,time+t);
+    return tmp;
+  }
+  BankAccount operator+(double m)
+  {
+    BankAccount tmp;
+    tmp.set(name,money+m,rate,time);
+    return tmp;
+  }
+  BankAccount operator*(double x)
+  {
+    BankAccount tmp;
+    tmp.set(name,money,rate+x,time);
+    return tmp;
+  }
+  double operator!()
+  {
+    return total();
+  }
+  double operator-(BankAccount tmp)
+  {
+    return total()-!tmp;
+  }
 };
 
 
 int main() {
-  BankAccount ivanov("Ivanov I. I.");
-  ivanov.show(30,2);
-  ivanov.show(29);
-  BankAccount petrov("Petrov P. P.",90,18,4);
-  petrov.setAll("Sidorov S .S.");
-  petrov.show();
-  petrov.show(50,5);
+  BankAccount ivanov("ИвановИ.И.",100,12,3);
+  ivanov.show();
+  BankAccount fellow;
+  fellow=ivanov+2;
+  fellow.show();
+  ((ivanov+25.0)*4).show();
+  double dif=fellow-ivanov;
+  cout<<"Разница итоговых сумм:\t"<<dif<<endl;
   return 0;
 }
